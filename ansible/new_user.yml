@@ -1,0 +1,28 @@
+---
+- name: Criar os usuarios dev1 e dev2
+  hosts: all
+  become: true
+  tasks:
+    - name: Dev1 
+      user: 
+        name: dev1
+        state: present
+        ssh_key_file: /home/dev1/dev1.pub
+
+    - name: SSH
+      copy:
+        src: /etc/vagrant/devops-test/ansible/pubkeys/dev1.pub
+        dest: /home/dev1/dev1.pub
+  
+    - name: Dev2
+      user:
+        name: dev2
+        state: present
+        ssh_key_file: /home/dev2/dev2.pub
+
+    - name: SSH
+      copy:
+        src: /etc/vagrant/devops-test/ansible/pubkeys/dev2.pub
+        dest: /home/dev2/dev2.pub
+
+

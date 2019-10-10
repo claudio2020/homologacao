@@ -1,0 +1,44 @@
+---
+- name: Instalação Jenkins
+  hosts: jenkins
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Instalação Pacotes
+      yum:
+        name:
+          - wget
+          - java-1.8.0-openjdk
+
+    - name: Configuração do Repositorio
+      get_url:
+        url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Importacao da chave do Jenkins - Repositorio
+      rpm_key:
+        state: present
+        key: https://jenkins-ci.org/redhat/jenkins-ci.org.key
+
+    - name: Instalação Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Habilita e inicia serviço do Jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: true
+
+    - name: Aguarda 30 segundos até o serviço do jenkins subir
+      wait_for: timeout=30
+
+    - name: Get init password Jenkins
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+
+    - name: Print init password Jenkins
+      debug:
+        var: result.stdout
